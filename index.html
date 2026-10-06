@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QCM - Le Numérique et Moi !</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1E1E1E;
+            --card-hover: #262626;
+            --text-color: #E0E0E0;
+            --text-muted: #9E9E9E;
+            --accent-color: #DEFF9A;
+            --accent-hover: #c9f578;
+            --correct-color: #4EAE67;
+            --correct-bg: rgba(78, 174, 103, 0.15);
+            --wrong-color: #FF6B6B;
+            --wrong-bg: rgba(255, 107, 107, 0.15);
+            --border-color: #2F2F2F;
+            --border-radius: 14px;
+            --font-stack: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-stack);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            line-height: 1.5;
+        }
+
+        .quiz-wrapper {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+            width: 100%;
+            max-width: 780px;
+            padding: 28px;
+            position: relative;
+        }
+
+        .quiz-header {
+            margin-bottom: 22px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 18px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tag-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: rgba(222, 255, 154, 0.12);
+            color: var(--accent-color);
+            border: 1px solid rgba(222, 255, 154, 0.25);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .score-pill {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background-color: #121212;
+            padding: 4px 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-size: 1.55rem;
+            color: #FFFFFF;
+            font-weight: 700;
+        }
+
+        .progress-section {
+            margin-top: 14px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            background-color: #121212;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #A8E85A, var(--accent-color));
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 6px;
+        }
+
+        .question-card {
+            margin: 20px 0;
+        }
+
+        .question-number {
+            font-size: 0.85rem;
+            color: var(--accent-color);
+            font-weight: 700;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .question-title {
+            font-size: 1.18rem;
+            color: #FFFFFF;
+            font-weight: 600;
+            margin-bottom: 18px;
+            line-height: 1.4;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-button {
+            background-color: #232323;
+            border: 1.5px solid #333333;
+            border-radius: 10px;
+            color: var(--text-color);
+            padding: 14px 16px;
+            font-size: 0.98rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-family: inherit;
+        }
+
+        .option-button:hover:not(:disabled) {
+            background-color: var(--card-hover);
+            border-color: var(--accent-color);
+            transform: translateX(4px);
+        }
+
+        .option-button:disabled {
+            cursor: default;
+        }
+
+        .option-button.correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct-color);
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+
+        .option-button.correct::after {
+            content: "✓";
+            color: var(--correct-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .option-button.wrong {
+            background-color: var(--wrong-bg);
+            border-color: var(--wrong-color);
+            color: #FFFFFF;
+        }
+
+        .option-button.wrong::after {
+            content: "✕";
+            color: var(--wrong-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .option-button.dimmed {
+            opacity: 0.45;
+        }
+
+        .feedback-container {
+            margin-top: 18px;
+            padding: 14px 16px;
+            border-radius: 8px;
+            display: none;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .feedback-container.correct {
+            background-color: var(--correct-bg);
+            border-left: 4px solid var(--correct-color);
+        }
+
+        .feedback-container.wrong {
+            background-color: var(--wrong-bg);
+            border-left: 4px solid var(--wrong-color);
+        }
+
+        .feedback-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .feedback-container.correct .feedback-title {
+            color: var(--correct-color);
+        }
+
+        .feedback-container.wrong .feedback-title {
+            color: var(--wrong-color);
+        }
+
+        .feedback-text {
+            font-size: 0.9rem;
+            color: var(--text-color);
+            line-height: 1.45;
+        }
+
+        .actions-row {
+            margin-top: 22px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-action {
+            background-color: var(--accent-color);
+            color: #121212;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .btn-action:hover:not(:disabled) {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(222, 255, 154, 0.25);
+        }
+
+        .btn-action:disabled {
+            background-color: #2D2D2D;
+            color: #666666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .results-view {
+            text-align: center;
+            padding: 10px 0;
+            display: none;
+            animation: fadeIn 0.35s ease;
+        }
+
+        .score-circle-wrapper {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px auto;
+            border-radius: 50%;
+            background: #171717;
+            border: 4px solid var(--accent-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 24px rgba(222, 255, 154, 0.15);
+        }
+
+        .score-val {
+            font-size: 2.6rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            line-height: 1;
+        }
+
+        .score-sub {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .results-view h2 {
+            font-size: 1.5rem;
+            color: #FFFFFF;
+            margin-bottom: 10px;
+        }
+
+        .result-description {
+            font-size: 0.98rem;
+            color: var(--text-color);
+            max-width: 580px;
+            margin: 0 auto 24px auto;
+            line-height: 1.5;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            max-width: 360px;
+            margin: 0 auto 24px auto;
+        }
+
+        .stat-box {
+            background-color: #151515;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .stat-num {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .stat-num.succ { color: var(--correct-color); }
+        .stat-num.err { color: var(--wrong-color); }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .quiz-wrapper {
+                padding: 18px;
+            }
+            h1 {
+                font-size: 1.3rem;
+            }
+            .question-title {
+                font-size: 1.05rem;
+            }
+            .option-button {
+                padding: 12px 14px;
+                font-size: 0.9rem;
+            }
+            .score-circle-wrapper {
+                width: 130px;
+                height: 130px;
+            }
+            .score-val {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-wrapper">
+        <div id="quiz-view">
+            <div class="quiz-header">
+                <div class="header-top">
+                    <span class="tag-badge">🌱 Le Numérique et Moi</span>
+                    <span class="score-pill" id="live-score">Score : 0 / 40</span>
+                </div>
+                <h1>Santé, Écologie &amp; Citoyenneté Numérique</h1>
+                <div class="progress-section">
+                    <div class="progress-info">
+                        <span>Progression</span>
+                        <span id="progress-text">Question 1 sur 40</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-number" id="question-index-label">Question 1</div>
+                <div class="question-title" id="question-text">Chargement de la question...</div>
+                <div class="options-list" id="options-container"></div>
+            </div>
+
+            <div class="feedback-container" id="feedback-box">
+                <div class="feedback-title" id="feedback-title">Bonne réponse !</div>
+                <div class="feedback-text" id="feedback-desc">Explication pédagogique...</div>
+            </div>
+
+            <div class="actions-row">
+                <button class="btn-action" id="next-btn" disabled>Question suivante ➔</button>
+            </div>
+        </div>
+
+        <div class="results-view" id="results-view">
+            <span class="tag-badge" style="margin-bottom: 14px;">Bilan Officiel Pix &amp; Santé</span>
+            
+            <div class="score-circle-wrapper">
+                <div class="score-val" id="final-percent">0%</div>
+                <div class="score-sub">Score Final</div>
+            </div>
+
+            <h2 id="result-title-text">Niveau de Maîtrise</h2>
+            <p class="result-description" id="result-desc-text">Commentaire d'évaluation...</p>
+
+            <div class="summary-stats">
+                <div class="stat-box">
+                    <div class="stat-num succ" id="stat-correct-count">0</div>
+                    <div class="stat-label">Réponses correctes</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num err" id="stat-wrong-count">0</div>
+                    <div class="stat-label">Erreurs / Pièges</div>
+                </div>
+            </div>
+
+            <button class="btn-action" onclick="restartQuiz()">🔄 Recommencer l'évaluation</button>
+        </div>
+    </div>
+
+    <script>
+        const rawQuestions = [
+            // Slide 1 & 2 : Introduction & Bienvenue dans le monde connecté
+            {
+                q: "Quel est le triple objectif du guide « Le Numérique et Moi » ?",
+                options: [
+                    "Protéger sa santé, préserver la planète et utiliser les super-pouvoirs d'Internet pour bien grandir",
+                    "Acheter le smartphone le plus cher possible chaque année",
+                    "Passer 10 heures par jour devant des jeux vidéo sans faire de pause",
+                    "Supprimer tous les ordinateurs du collège"
+                ],
+                answer: 0,
+                feedback: "Ce cours apprend à concilier bien-être physique et mental, protection de l'environnement et usage positif du numérique."
+            },
+            {
+                q: "Pourquoi le numérique est-il comparé à une pratique sportive dans le cours ?",
+                options: [
+                    "C'est un formidable outil au quotidien, mais il faut connaître les règles du jeu pour se protéger",
+                    "Parce qu'il faut courir avec sa tablette sous le bras",
+                    "Parce que les ordinateurs fonctionnent uniquement dans les gymnases",
+                    "Parce qu'il donne des médailles olympiques automatiquement"
+                ],
+                answer: 0,
+                feedback: "Comme dans tout sport, la liberté et le plaisir d'usage nécessitent des règles claires de sécurité et d'hygiène de vie."
+            },
+            {
+                q: "Parmi ces propositions, quels sont les trois grands usages positifs d'Internet présentés dans le cours ?",
+                options: [
+                    "Apprendre en s'amusant, garder le contact avec proches/copains, et créer/découvrir le monde",
+                    "Insulter des inconnus, diffuser des rumeurs et tricher aux contrôles",
+                    "Télécharger des virus, acheter des téléphones et pirater des comptes",
+                    "Ne plus dormir la nuit, s'isoler et refuser de parler à ses parents"
+                ],
+                answer: 0,
+                feedback: "Internet permet d'apprendre, d'échanger et de créer lorsqu'il est utilisé de manière équilibrée et réfléchie."
+            },
+
+            // Slide 3 & 4 : Niveau 1 : Protéger sa Santé Physique - Posture & Yeux
+            {
+                q: "Quelle est la bonne posture à adopter devant un écran d'ordinateur pour préserver son dos ?",
+                options: [
+                    "Se tenir le dos bien droit, l'écran à la hauteur des yeux et à une distance d'au moins un bras",
+                    "Être complètement avachi sur sa chaise avec l'écran collé au nez",
+                    "Être allongé par terre avec la tête penchée vers le bas",
+                    "Tourner le dos à l'écran et regarder par-dessus son épaule"
+                ],
+                answer: 0,
+                feedback: "Un dos droit, un regard aligné à l'horizontale et une distance minimale d'un bras évitent les douleurs cervicales et lombaires."
+            },
+            {
+                q: "À quelle distance minimale l'écran de travail doit-il être placé par rapport à tes yeux ?",
+                options: [
+                    "À une distance d'au moins un bras",
+                    "À 5 centimètres seulement",
+                    "À plus de 10 mètres",
+                    "Il n'y a aucune distance recommandée"
+                ],
+                answer: 0,
+                feedback: "Tendre son bras devant soi donne le repère idéal pour positionner son écran sans fatiguer sa vue."
+            },
+            {
+                q: "En quoi consiste la fameuse règle de santé visuelle « La Règle du 20-20-20 » ?",
+                options: [
+                    "Toutes les 20 minutes, regardez au loin pendant 20 secondes pour reposer vos yeux",
+                    "Regarder 20 vidéos de 20 minutes toutes les 20 heures",
+                    "Régler la luminosité de l'écran à 20% pendant 20 jours",
+                    "Cligner des yeux 20 fois toutes les 20 secondes"
+                ],
+                answer: 0,
+                feedback: "Fixer un point lointain toutes les 20 minutes pendant 20 secondes permet aux muscles oculaires de se relâcher."
+            },
+            {
+                q: "Pourquoi la règle du 20-20-20 demande-t-elle de regarder « au loin » ?",
+                options: [
+                    "Pour détendre les muscles des yeux qui se fatiguent en fixant un écran de près trop longtemps",
+                    "Pour vérifier si le professeur arrive dans la pièce",
+                    "Pour repérer les antennes Wi-Fi dans la rue",
+                    "Pour éteindre l'ordinateur à distance"
+                ],
+                answer: 0,
+                feedback: "La vision de près prolongée crispe l'accommodation oculaire ; regarder au loin restaure le confort visuel."
+            },
+
+            // Slide 5 : Bouger et s'aérer l'esprit (Sédentarité & Pauses)
+            {
+                q: "Qu'est-ce que « la sédentarité » liée aux écrans et quel est son effet sur le corps ?",
+                options: [
+                    "Rester assis trop longtemps, ce qui ralentit notre énergie et fatigue le corps",
+                    "Faire 10 kilomètres de course à pied en tenant une tablette",
+                    "Un virus informatique qui attaque la souris",
+                    "Une nouvelle application de messagerie instantanée"
+                ],
+                answer: 0,
+                feedback: "La sédentarité prolongée engourdit les muscles, freine la circulation sanguine et génère de la fatigue physique."
+            },
+            {
+                q: "Quelle pause active devez-vous OBLIGATOIREMENT faire après 30 minutes passées devant un écran ?",
+                options: [
+                    "Faire une pause de 5 minutes : s'étirer, marcher ou aller jouer dehors !",
+                    "Changer immédiatement de jeu vidéo pour continuer 2 heures de plus",
+                    "Manger des bonbons sans quitter sa chaise",
+                    "Regarder une vidéo sur son smartphone pendant la pause"
+                ],
+                answer: 0,
+                feedback: "Après 30 minutes d'écran, 5 minutes de pause physique (étirements, marche, grand air) rechargent votre jauge d'énergie."
+            },
+            {
+                q: "Parmi ces activités, laquelle est recommandée pendant une pause d'écran de 5 minutes ?",
+                options: [
+                    "Faire des étirements, marcher dans la maison ou s'aérer",
+                    "Ouvrir un autre écran pour regarder des vidéos courtes",
+                    "Envoyer 50 messages sur les réseaux sociaux",
+                    "Rester assis les yeux fermés devant le moniteur allumé"
+                ],
+                answer: 0,
+                feedback: "La pause doit être un vrai moment de rupture sans aucun écran pour soulager le corps et l'esprit."
+            },
+
+            // Slide 6 & 7 : Niveau 2 : Bien-être et Santé Mentale - Temps d'écran & Équilibre
+            {
+                q: "Quel est le temps moyen passé sur les écrans par jour mentionné comme excessif (« 4h+ ») ?",
+                options: [
+                    "Plus de 4 heures par jour",
+                    "15 minutes par jour",
+                    "30 minutes par semaine",
+                    "2 heures par mois"
+                ],
+                answer: 0,
+                feedback: "Passer plus de 4 heures quotidiennes sur les écrans est excessif et perturbe les apprentissages et le sommeil."
+            },
+            {
+                q: "Quelles sont les 3 conséquences néfastes d'un temps d'écran excessif présentées dans le cours ?",
+                options: [
+                    "Baisse de l'attention en classe, énervement plus facile, et moins de moments précieux avec les copains",
+                    "Amélioration des notes, excellente forme physique et calme absolu",
+                    "Augmentation de la batterie du téléphone et baisse de la facture",
+                    "Suppression des devoirs scolaires"
+                ],
+                answer: 0,
+                feedback: "L'excès d'écran disperse l'attention, augmente l'irritabilité et réduit les échanges sociaux réels."
+            },
+            {
+                q: "Quel est le conseil officiel de Santé Publique pour garder un bon équilibre de vie ?",
+                options: [
+                    "Fixer des règles simples de temps avec ses parents et privilégier les activités réelles",
+                    "Laisser l'ordinateur allumé toute la nuit dans sa chambre",
+                    "Refuser toute discussion avec sa famille",
+                    "Passer tout son week-end devant des séries"
+                ],
+                answer: 0,
+                feedback: "Poser un cadre négocié avec les parents et pratiquer des loisirs réels (sport, lecture, jeux) préserve l'équilibre mental."
+            },
+
+            // Slide 8 : La Cartographie des « 4 Pas »
+            {
+                q: "Quelle est la règle du 1er « Pas » : « Pas le matin » ?",
+                options: [
+                    "Ne pas utiliser d'écran le matin pour ne pas fatiguer son cerveau avant de venir au collège",
+                    "Ne pas manger de petit-déjeuner",
+                    "Arriver en retard au collège",
+                    "Ne pas allumer la lumière de sa chambre"
+                ],
+                answer: 0,
+                feedback: "Consulter un écran dès le réveil sature l'attention et réduit les capacités de concentration dès le début des cours."
+            },
+            {
+                q: "Pourquoi applique-t-on le 2ème « Pas » : « Pas aux repas » ?",
+                options: [
+                    "Pour discuter avec sa famille et apprécier son repas sans écran",
+                    "Pour manger le plus vite possible sans parler",
+                    "Pour nettoyer l'écran avec une serviette de table",
+                    "Pour jouer avec sa fourchette"
+                ],
+                answer: 0,
+                feedback: "Les repas partagés sans écran favorisent les échanges familiaux et permettent une alimentation plus sereine."
+            },
+            {
+                q: "Que prescrit le 3ème « Pas » : « Pas au coucher » ?",
+                options: [
+                    "Éteindre tous les écrans au moins 1 heure avant de dormir pour bien grandir",
+                    "Dormir avec son smartphone sous les yeux allumé",
+                    "Regarder des vidéos jusqu'à 2 heures du matin",
+                    "Mettre son réveil toutes les 15 minutes"
+                ],
+                answer: 0,
+                feedback: "Couper les écrans au moins 1 heure avant le coucher permet la sécrétion de mélatonine et un sommeil réparateur."
+            },
+            {
+                q: "Que stipule le 4ème « Pas » : « Pas en chambre » ?",
+                options: [
+                    "La nuit, le téléphone et la tablette restent hors de la chambre !",
+                    "Interdiction d'avoir un lit dans sa chambre",
+                    "Garder son ordinateur branché sur son oreiller",
+                    "Cacher sa console sous sa couette"
+                ],
+                answer: 0,
+                feedback: "Laisser les appareils hors de la chambre la nuit supprime la tentation des notifications nocturnes."
+            },
+
+            // Slide 9 : Le Bouclier de Bienveillance & Réflexe 3018
+            {
+                q: "Quelle question du « Bouclier de Bienveillance » dois-tu te poser avant toute action sur Internet ?",
+                options: [
+                    "« Le ferais-tu dans la cour de récréation ? » (Si la réponse est NON ➔ On s'arrête !)",
+                    "« Est-ce que cette photo va faire pleurer quelqu'un ? »",
+                    "« Combien d'abonnés vais-je gagner ? »",
+                    "« Est-ce que mon message est écrit en anglais ? »"
+                ],
+                answer: 0,
+                feedback: "Si tu n'oserais pas dire ou faire une chose face à face dans la cour, ne la fais jamais derrière un écran."
+            },
+            {
+                q: "Quelles informations personnelles ne faut-il JAMAIS partager sur les réseaux ou les jeux ?",
+                options: [
+                    "Vos mots de passe, votre adresse postale ou des photos personnelles",
+                    "Le titre de votre livre préféré",
+                    "Le prénom de votre personnage de fiction favori",
+                    "Le nom d'un pays que vous aimeriez visiter"
+                ],
+                answer: 0,
+                feedback: "Les coordonnées sensibles et données d'accès ne doivent jamais être divulguées à des tiers."
+            },
+            {
+                q: "En cas de problème, de moqueries ou de cyberharcèlement (victime ou témoin), quel numéro gratuit et anonyme faut-il composer ?",
+                options: [
+                    "Le 3018",
+                    "Le 15",
+                    "Le 18",
+                    "Le 112"
+                ],
+                answer: 0,
+                feedback: "Le 3018 est le numéro national d'urgence gratuit et confidentiel dédié à la protection des mineurs sur le Web."
+            },
+            {
+                q: "Pourquoi le numéro 3018 est-il particulièrement rassurant et sécurisant pour les collégiens ?",
+                options: [
+                    "Parce qu'il est 100% gratuit, anonyme et ne s'affiche pas sur la facture téléphonique des parents",
+                    "Parce qu'il envoie des cadeaux gratuits à la maison",
+                    "Parce qu'il remplace le carnet de correspondance",
+                    "Parce qu'il résout les exercices de mathématiques"
+                ],
+                answer: 0,
+                feedback: "Le 3018 garantit une écoute bienveillante, confidentielle et sans trace sur les factures."
+            },
+
+            // Slide 10 & 11 : Niveau 3 : Numérique et Environnement - Le Poids Invisible
+            {
+                q: "Même si le numérique semble invisible, a-t-il un impact sur notre planète ?",
+                options: [
+                    "Oui, un réel impact écologique (consommation d'énergie, ressources rares et pollution)",
+                    "Non, le numérique ne pollue absolument pas car il n'y a pas de papier",
+                    "Non, les ordinateurs fabriquent de l'électricité propre",
+                    "Uniquement si l'ordinateur est peint en noir"
+                ],
+                answer: 0,
+                feedback: "Le fonctionnement d'Internet, des réseaux et la fabrication du matériel ont une empreinte carbone et écologique majeure."
+            },
+            {
+                q: "Combien de matériaux précieux et métaux rares sont nécessaires pour fabriquer un seul smartphone ?",
+                options: [
+                    "Plus de 70 matériaux précieux et beaucoup d'énergie",
+                    "Seulement 2 matériaux simples (du sable et du plastique)",
+                    "Aucun métal rare",
+                    "Un seul gramme de fer"
+                ],
+                answer: 0,
+                feedback: "L'extraction et le raffinage de plus de 70 métaux et minéraux font de la fabrication l'étape la plus polluante du smartphone."
+            },
+            {
+                q: "Pourquoi « changer d'appareil trop souvent » est-il un grave problème pour l'environnement ?",
+                options: [
+                    "Parce que cela produit des déchets électroniques et des polluants dangereux pour la terre",
+                    "Parce que les nouveaux téléphones fonctionnent moins bien",
+                    "Parce que les câbles deviennent trop longs",
+                    "Parce que le collège refuse les nouveaux téléphones"
+                ],
+                answer: 0,
+                feedback: "Les déchets d'équipements électriques et électroniques (DEEE) contiennent des substances toxiques polluant les sols."
+            },
+            {
+                q: "Comment fonctionnent les « Data Centers » (centres de données) qui hébergent les vidéos en ligne ?",
+                options: [
+                    "Ce sont d'immenses usines d'ordinateurs qui consomment de l'électricité 24h/24 et nécessitent du refroidissement",
+                    "Ce sont des petits boîtiers fonctionnant sans aucune électricité",
+                    "Ce sont des satellites solaires qui ne chauffent jamais",
+                    "Ce sont des nuages naturels dans le ciel"
+                ],
+                answer: 0,
+                feedback: "Les Data Centers tournent jour et nuit et consomment des quantités massives d'électricité pour alimenter et refroidir les serveurs."
+            },
+
+            // Slide 12 : L'Équipement de l'Éco-Citoyen (3 écogestes)
+            {
+                q: "Quel écogeste permet de « Prendre soin du matériel » pour le garder le plus longtemps possible ?",
+                options: [
+                    "Utiliser une coque de protection et faire attention à son équipement pour éviter la casse",
+                    "Jeter son smartphone par terre dès qu'il a une petite rayure",
+                    "Laisser sa tablette sous la pluie",
+                    "Changer de téléphone tous les 6 mois"
+                ],
+                answer: 0,
+                feedback: "Protéger physiquement ses appareils allonge leur durée de vie et retarde l'impact écologique d'un nouvel achat."
+            },
+            {
+                q: "Pourquoi est-il conseillé d'« Éteindre le Wi-Fi la nuit » à la maison ?",
+                options: [
+                    "Pour couper la box et les appareils en veille afin d'économiser l'électricité de la maison",
+                    "Pour empêcher les voleurs d'entrer dans la maison",
+                    "Pour effacer les devoirs sur l'ENT",
+                    "Pour que l'ordinateur se réveille plus tôt"
+                ],
+                answer: 0,
+                feedback: "Éteindre les box et veilles la nuit réduit la facture d'électricité et évite le gaspillage d'énergie inutile."
+            },
+            {
+                q: "En quoi consiste l'écogeste « Nettoyer ses données » sur le réseau ?",
+                options: [
+                    "Supprimer les photos floues, doublons et vidéos inutiles enregistrées sur le Cloud",
+                    "Laver l'écran de la tablette avec de l'eau et du savon",
+                    "Effacer le nom de ses professeurs",
+                    "Créer 100 copies de la même vidéo"
+                ],
+                answer: 0,
+                feedback: "Stocker moins de fichiers inutiles sur les serveurs distants libère de l'espace sur les Data Centers et économise l'énergie."
+            },
+
+            // Slide 13 & 14 : Niveau 4 : Les Super-Pouvoirs du Numérique - La Magie de l'Inclusion
+            {
+                q: "Comment le numérique se met-il au service de la « Santé & Soin » dans notre société ?",
+                options: [
+                    "La médecine l'utilise pour téléconsulter à distance ou rééduquer des patients",
+                    "Il remplace les médecins par des jeux vidéo",
+                    "Il fabrique des médicaments en plastique",
+                    "Il interdit d'aller à l'hôpital"
+                ],
+                answer: 0,
+                feedback: "La télémédecine et les outils numériques de rééducation permettent de soigner des patients partout et plus efficacement."
+            },
+            {
+                q: "Comment le numérique favorise-t-il l'« Accessibilité » pour les élèves à besoins particuliers ?",
+                options: [
+                    "Des applications et logiciels aident les élèves dys ou malvoyants à lire et apprendre comme les autres",
+                    "Il dispense les élèves de venir au collège",
+                    "Il donne les réponses des contrôles à l'avance",
+                    "Il supprime les livres scolaires"
+                ],
+                answer: 0,
+                feedback: "Synthèse vocale, polices adaptées et outils d'accessibilité offrent l'égalité des chances à tous les apprenants."
+            },
+            {
+                q: "Quelle certification officielle valide vos « Compétences » et super-pouvoirs numériques en classe de 6ème ?",
+                options: [
+                    "L'Attestation Pix 6ème",
+                    "Le permis de conduire automobile",
+                    "Le diplôme de champion de jeux vidéo",
+                    "Le brevet des collèges anticipé"
+                ],
+                answer: 0,
+                feedback: "Le parcours Pix 6ème évalue et certifie officiellement vos connaissances et réflexes numériques."
+            },
+
+            // Slide 15 : Le Comparateur de Choix : Vos Réflexes Gagnants
+            {
+                q: "Au moment de se coucher, quel est le RÉFLEXE GAGNANT face aux écrans ?",
+                options: [
+                    "Laisser les écrans dans le salon (et non sous le lit ou dans la chambre)",
+                    "Garder la tablette allumée sous sa couette",
+                    "Mettre son smartphone sous son oreiller avec le son allumé",
+                    "Regarder des vidéos jusqu'à s'endormir d'épuisement"
+                ],
+                answer: 0,
+                feedback: "Déposer les écrans hors de la chambre garantit une nuit paisible sans interruption ni tentation."
+            },
+            {
+                q: "Devant un jeu vidéo ou une série captivante, quel réflexe gagnant devez-vous appliquer ?",
+                options: [
+                    "Faire une vraie pause active toutes les 30 minutes",
+                    "Y passer tout l'après-midi sans bouger de sa chaise",
+                    "Sauter les repas pour ne pas perdre sa partie",
+                    "Fermer les volets pour jouer dans le noir absolu"
+                ],
+                answer: 0,
+                feedback: "Rythmer son temps de jeu par des pauses régulières évite la sédentarité et la fatigue nerveuse."
+            },
+            {
+                q: "Si tu reçois un message méchant ou blessant en ligne, quel est le RÉFLEXE GAGNANT ?",
+                options: [
+                    "En parler tout de suite à un adulte de confiance sans répondre avec colère",
+                    "Répondre avec des insultes encore plus graves",
+                    "Se cacher et garder le secret en pleurant",
+                    "Supprimer son téléphone"
+                ],
+                answer: 0,
+                feedback: "Ne pas alimenter la dispute, garder les preuves et alerter un adulte ou le 3018 est la seule bonne réaction."
+            },
+            {
+                q: "Si ton téléphone ou ta tablette commence à être ancien, quelle attitude éco-responsable adoptes-tu ?",
+                options: [
+                    "En prendre soin avec une coque pour le faire durer le plus longtemps possible",
+                    "Vouloir le jeter immédiatement pour avoir le tout dernier modèle à la mode",
+                    "Le casser volontairement pour en réclamer un neuf",
+                    "Le jeter dans la poubelle des ordures ménagères"
+                ],
+                answer: 0,
+                feedback: "Prolonger la durée d'usage de ses équipements est le geste écologique le plus efficace pour la planète."
+            },
+
+            // Questions de synthèse transversale & Clôture
+            {
+                q: "Pourquoi est-il important de concilier santé physique, bien-être mental et écologie dans ses pratiques numériques ?",
+                options: [
+                    "Pour grandir harmonieusement, réussir sa scolarité et devenir un citoyen numérique responsable",
+                    "Pour impressionner ses amis sur les réseaux",
+                    "Pour ne plus jamais utiliser d'ordinateur de sa vie",
+                    "Pour gagner de l'argent sur Internet"
+                ],
+                answer: 0,
+                feedback: "Le numérique est un outil formidable quand il est maîtrisé avec équilibre, respect d'autrui et conscience écologique."
+            },
+            {
+                q: "Quel geste simple permet de réduire à la fois la fatigue oculaire et la facture d'électricité la nuit ?",
+                options: [
+                    "Éteindre complètement ses appareils et la box Wi-Fi avant d'aller dormir",
+                    "Laisser tous les écrans allumés avec une musique forte",
+                    "Mettre son téléphone en mode charge rapide sous son lit",
+                    "Consulter ses messages au milieu de la nuit"
+                ],
+                answer: 0,
+                feedback: "Éteindre les appareils la nuit favorise le sommeil et supprime les consommations d'énergie inutiles."
+            },
+            {
+                q: "Si un camarade de classe semble triste ou stressé à cause de messages reçus sur son téléphone, que lui conseilles-tu ?",
+                options: [
+                    "D'en parler immédiatement à un adulte (parents, CPE, prof) et d'appeler le 3018",
+                    "De ne rien dire et de répondre par des menaces",
+                    "De créer un faux compte pour attaquer les autres",
+                    "De continuer à lire les messages méchants tous les soirs"
+                ],
+                answer: 0,
+                feedback: "La solidarité et l'orientation vers des adultes référents ou le 3018 permettent de stopper le harcèlement."
+            },
+            {
+                q: "En conclusion de cette mission, quel titre valide l'ensemble de vos bons réflexes de santé, d'écologie et d'inclusion ?",
+                options: [
+                    "Le titre de Super-Héros et Éco-Citoyen du Web (Attestation Pix 6ème) !",
+                    "Le diplôme de joueur professionnel de jeux vidéo",
+                    "Le certificat de réparateur de smartphones",
+                    "La médaille du plus grand temps passé sur les réseaux"
+                ],
+                answer: 0,
+                feedback: "Bravo ! Tu as assimilé les 4 niveaux pour utiliser le numérique en prenant soin de toi, des autres et de la Terre !"
+            }
+        ];
+
+        let questions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let isAnswered = false;
+
+        const quizView = document.getElementById('quiz-view');
+        const resultsView = document.getElementById('results-view');
+        const questionText = document.getElementById('question-text');
+        const questionIndexLabel = document.getElementById('question-index-label');
+        const optionsContainer = document.getElementById('options-container');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const liveScore = document.getElementById('live-score');
+        const feedbackBox = document.getElementById('feedback-box');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackDesc = document.getElementById('feedback-desc');
+        const nextBtn = document.getElementById('next-btn');
+
+        function shuffleArray(arr) {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        function initQuiz() {
+            questions = shuffleArray(rawQuestions).map(q => {
+                const mappedOptions = q.options.map((optText, originalIndex) => ({
+                    text: optText,
+                    isCorrect: originalIndex === q.answer
+                }));
+                return {
+                    q: q.q,
+                    options: shuffleArray(mappedOptions),
+                    feedback: q.feedback
+                };
+            });
+
+            currentIndex = 0;
+            score = 0;
+            isAnswered = false;
+
+            quizView.style.display = 'block';
+            resultsView.style.display = 'none';
+            liveScore.innerText = `Score : 0 / ${questions.length}`;
+
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            isAnswered = false;
+            nextBtn.disabled = true;
+            feedbackBox.style.display = 'none';
+
+            const total = questions.length;
+            const currentNum = currentIndex + 1;
+            const qData = questions[currentIndex];
+
+            progressText.innerText = `Question ${currentNum} sur ${total}`;
+            questionIndexLabel.innerText = `Question ${currentNum} / ${total}`;
+            progressBar.style.width = `${(currentNum / total) * 100}%`;
+
+            questionText.innerText = qData.q;
+
+            optionsContainer.innerHTML = '';
+            qData.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-button';
+                btn.innerText = opt.text;
+                btn.onclick = () => handleSelectOption(idx, opt.isCorrect);
+                optionsContainer.appendChild(btn);
+            });
+
+            if (currentIndex === total - 1) {
+                nextBtn.innerText = "Consulter le Bilan Pix ➔";
+            } else {
+                nextBtn.innerText = "Question suivante ➔";
+            }
+        }
+
+        function handleSelectOption(selectedIdx, isCorrect) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const buttons = optionsContainer.querySelectorAll('.option-button');
+            const qData = questions[currentIndex];
+
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                if (qData.options[idx].isCorrect) {
+                    btn.classList.add('correct');
+                } else if (idx === selectedIdx) {
+                    btn.classList.add('wrong');
+                } else {
+                    btn.classList.add('dimmed');
+                }
+            });
+
+            if (isCorrect) {
+                score++;
+                feedbackBox.className = 'feedback-container correct';
+                feedbackTitle.innerText = "✓ Bonne réponse !";
+            } else {
+                feedbackBox.className = 'feedback-container wrong';
+                feedbackTitle.innerText = "✕ Mauvaise réponse !";
+            }
+
+            liveScore.innerText = `Score : ${score} / ${questions.length}`;
+            feedbackDesc.innerText = qData.feedback;
+            feedbackBox.style.display = 'block';
+
+            nextBtn.disabled = false;
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (currentIndex < questions.length - 1) {
+                currentIndex++;
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        });
+
+        function showResults() {
+            quizView.style.display = 'none';
+            resultsView.style.display = 'block';
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+
+            document.getElementById('final-percent').innerText = `${percent}%`;
+            document.getElementById('stat-correct-count').innerText = score;
+            document.getElementById('stat-wrong-count').innerText = total - score;
+
+            const titleEl = document.getElementById('result-title-text');
+            const descEl = document.getElementById('result-desc-text');
+
+            if (percent >= 90) {
+                titleEl.innerText = "🏆 Grand Super-Héros & Éco-Citoyen du Web !";
+                descEl.innerText = "Félicitations ! Tu maîtrises parfaitement la posture ergonomique, la règle du 20-20-20, les pauses actives contre la sédentarité, les « 4 Pas » (matin, repas, coucher, chambre), le bouclier de bienveillance, le réflexe 3018, le poids invisible du numérique (70 matériaux, Data Centers, écogestes) et les outils d'inclusion. Tu es fin prêt pour l'attestation Pix 6ème !";
+            } else if (percent >= 75) {
+                titleEl.innerText = "⭐ Éco-Citoyen Numérique Confirmé !";
+                descEl.innerText = "Très bon score ! Tu as acquis d'excellents réflexes pour prendre soin de ta santé, équilibrer ton temps d'écran, protéger l'environnement et utiliser Internet avec bienveillance.";
+            } else if (percent >= 50) {
+                titleEl.innerText = "🌱 Apprenti du Monde Connecté";
+                descEl.innerText = "Des bases solides, mais reste vigilant : revois bien la règle des « 4 Pas », la règle du 20-20-20, les 3 écogestes clés et le numéro 3018 pour parfaire tes connaissances.";
+            } else {
+                titleEl.innerText = "⚠️ Guide 'Le Numérique et Moi' à Relire";
+                descEl.innerText = "Attention à ta santé et à tes habitudes numériques ! Relis attentivement les 4 niveaux du cours, mémorise les réflexes gagnants et retente l'évaluation pour valider tes super-pouvoirs.";
+            }
+        }
+
+        function restartQuiz() {
+            initQuiz();
+        }
+
+        window.addEventListener('DOMContentLoaded', initQuiz);
+    </script>
+</body>
+</html>
